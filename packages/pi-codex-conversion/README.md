@@ -75,6 +75,9 @@ review `exec_command` before allowing additional input.
 pi install git:github.com/mkaros2025/pi-codex-tools
 ```
 
+The Git installation loads the tracked TypeScript source directly. The npm
+package uses its compiled `dist` entrypoint.
+
 After publishing the npm package:
 
 ```bash

@@ -14,11 +14,10 @@
   ],
   "pi": {
     "extensions": [
-      "./packages/pi-codex-conversion/dist/index.js"
+      "./packages/pi-codex-conversion/src/index.ts"
     ]
   },
   "scripts": {
-    "prepare": "npm run --workspace=@mkaros2025/pi-codex-compat build",
     "check": "npm run --workspace=@mkaros2025/pi-codex-compat check",
     "typecheck": "npm run --workspace=@mkaros2025/pi-codex-compat typecheck",
     "test": "npm run --workspace=@mkaros2025/pi-codex-compat test",

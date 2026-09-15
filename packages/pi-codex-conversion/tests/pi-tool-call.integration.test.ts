@@ -84,11 +84,13 @@ export default async function (pi) {
         };
         stream.push({ type: "start", partial: output });
         if (callNumber === 0) {
-          output.content.push({ type: "toolCall", id: "call-exec", name: "exec_command", arguments: { command: "node --version", cwd: workdir } });
+          output.content.push({ type: "toolCall", id: "call-exec", name: "exec_command", arguments: { command: "node -p 1", cwd: workdir } });
         } else if (callNumber === 1) {
           output.content.push({ type: "toolCall", id: "call-patch", name: "apply_patch", arguments: { patchText: firstPatch } });
         } else if (callNumber === 2) {
           output.content.push({ type: "toolCall", id: "call-move", name: "apply_patch", arguments: { input: movePatch } });
+        } else if (callNumber === 3) {
+          output.content.push({ type: "toolCall", id: "call-denied-exec", name: "exec_command", arguments: { command: "node -p 2 > command-marker.txt", cwd: workdir } });
         } else {
           output.content.push({ type: "text", text: "integration complete" });
         }
@@ -114,9 +116,9 @@ export default async function (pi) {
       calls.push({ toolName: event.toolName, input: event.input });
     }
   });
-  pi.on("tool_result", (event) => {
+  pi.on("tool_execution_end", (event) => {
     if (["exec_command", "apply_patch"].includes(event.toolName)) {
-      results.push({ toolName: event.toolName, isError: event.isError, content: event.content });
+      results.push({ toolName: event.toolName, isError: event.isError, content: event.result?.content ?? [] });
     }
   });
   pi.on("agent_settled", (_event, ctx) => {
@@ -139,6 +141,7 @@ test(
     const secondPath = join(project, "second.txt");
     const firstPath = join(project, "first.txt");
     const movedPath = join(project, "moved.txt");
+    const commandMarkerPath = join(project, "command-marker.txt");
 
     try {
       await mkdir(join(isolatedAgent, "npm"), { recursive: true });
@@ -154,12 +157,13 @@ test(
           shellTools: { exec_command: { commandArgument: "cmd", workdirArgument: "workdir" } },
           permission: {
             "*": "allow",
-            bash: { "*": "allow" },
+            bash: { "*": "allow", "node -p 2*": "deny" },
             path_write: { "*": "allow", [secondPath]: "deny", [movedPath]: "deny" },
           },
         }),
       );
       await writeFile(sourcePath, "source\n");
+      await writeFile(commandMarkerPath, "unchanged\n");
       await writeFile(driverPath, driver);
       await symlink(
         join(agentDir, "npm", "node_modules"),
@@ -218,7 +222,7 @@ test(
         results: Array<{ toolName: string; isError: boolean; content: Array<{ text?: string }> }>;
       };
       assert.deepEqual(result.calls.map(({ toolName }) => toolName), ["exec_command", "apply_patch", "apply_patch"]);
-      assert.equal(result.calls[0]?.input["cmd"], "node --version");
+      assert.equal(result.calls[0]?.input["cmd"], "node -p 1");
       assert.equal(result.calls[0]?.input["workdir"], project);
       assert.equal(result.calls[1]?.input["input"], firstPatch);
       assert.equal(result.calls[2]?.input["input"], movePatch);
@@ -226,12 +230,15 @@ test(
         { toolName: "exec_command", isError: false },
         { toolName: "apply_patch", isError: true },
         { toolName: "apply_patch", isError: true },
+        { toolName: "exec_command", isError: true },
       ]);
       assert.match(result.results[1]?.content[0]?.text ?? "", /second\.txt/);
       assert.match(result.results[2]?.content[0]?.text ?? "", /moved\.txt/);
+      assert.match(result.results[3]?.content[0]?.text ?? "", /denied/i);
       await assert.rejects(access(firstPath), /ENOENT/);
       await assert.rejects(access(secondPath), /ENOENT/);
       assert.equal(await readFile(sourcePath, "utf8"), "source\n");
+      assert.equal(await readFile(commandMarkerPath, "utf8"), "unchanged\n");
       await assert.rejects(access(movedPath), /ENOENT/);
       child.stdin.end();
     } finally {
