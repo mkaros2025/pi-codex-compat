@@ -81,7 +81,7 @@ export function createApplyPatchTool(options: ApplyPatchToolOptions = {}): Param
   return {
     name: "apply_patch",
     label: "apply_patch",
-    description: "Apply a patch to files",
+    description: "Apply a Codex patch. Put the complete *** Begin Patch ... *** End Patch text in `input`; do not put a JSON object or Markdown fence inside `input`.",
     promptSnippet: "Edit files with patch",
     parameters: PARAMETERS,
     executionMode: "sequential",

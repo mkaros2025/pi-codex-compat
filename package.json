@@ -1,5 +1,5 @@
 {
-  "name": "pi-codex-tools-repo",
+  "name": "pi-codex-compat-repo",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -18,10 +18,10 @@
     ]
   },
   "scripts": {
-    "prepare": "npm run --workspace=pi-codex-tools build",
-    "check": "npm run --workspace=pi-codex-tools check",
-    "typecheck": "npm run --workspace=pi-codex-tools typecheck",
-    "test": "npm run --workspace=pi-codex-tools test",
-    "build": "npm run --workspace=pi-codex-tools build"
+    "prepare": "npm run --workspace=@mkaros2025/pi-codex-compat build",
+    "check": "npm run --workspace=@mkaros2025/pi-codex-compat check",
+    "typecheck": "npm run --workspace=@mkaros2025/pi-codex-compat typecheck",
+    "test": "npm run --workspace=@mkaros2025/pi-codex-compat test",
+    "build": "npm run --workspace=@mkaros2025/pi-codex-compat build"
   }
 }

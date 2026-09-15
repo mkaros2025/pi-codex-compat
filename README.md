@@ -1,4 +1,4 @@
-# pi-codex-tools
+# pi-codex-compat
 
 Focused fork of the Codex tool adapter for Pi. It keeps only:
 
@@ -13,6 +13,12 @@ Use `auto`, `on`, or `off` in `pi-codex-tools.json`, and adjust
 
 ```bash
 pi install git:github.com/mkaros2025/pi-codex-tools
+```
+
+After publishing the npm package:
+
+```bash
+pi install npm:@mkaros2025/pi-codex-compat
 ```
 
 See [`packages/pi-codex-conversion/README.md`](./packages/pi-codex-conversion/README.md).

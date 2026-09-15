@@ -1,4 +1,4 @@
-# pi-codex-tools
+# pi-codex-compat
 
 A small Pi extension that exposes four Codex-shaped tools:
 
@@ -75,9 +75,16 @@ review `exec_command` before allowing additional input.
 pi install git:github.com/mkaros2025/pi-codex-tools
 ```
 
+After publishing the npm package:
+
+```bash
+pi install npm:@mkaros2025/pi-codex-compat
+```
+
 Native helpers are bundled for Linux, macOS and Windows on x64 and arm64.
 
 This is a focused fork of
-[`pi-codex-conversion`](https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/4593f066d447925eae8e3106435f117236690f9/packages/pi-codex-conversion).
+[`pi-codex-conversion`](https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/4593f066d447925eae8e3106435f117236690f9e/packages/pi-codex-conversion).
 The TypeScript adapter remains MIT-licensed. Bundled native helpers are derived
-from OpenAI Codex under Apache-2.0; see `NOTICE` and `UPSTREAM-NATIVE.md`.
+from OpenAI Codex under Apache-2.0; see `NOTICE`, `UPSTREAM-NATIVE.md`, and
+`THIRD_PARTY-NATIVE.md` for the fixed native dependency inventory and license texts.

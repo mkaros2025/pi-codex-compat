@@ -1,5 +1,5 @@
 {
-  "name": "pi-codex-tools",
+  "name": "@mkaros2025/pi-codex-compat",
   "version": "0.1.0",
   "description": "Four Codex-compatible tools for Pi with model-based activation",
   "keywords": ["pi-package", "pi", "codex"],
@@ -33,6 +33,7 @@
     "LICENSE",
     "LICENSE-APACHE-2.0",
     "NOTICE",
+    "THIRD_PARTY-NATIVE.md",
     "UPSTREAM-NATIVE.md"
   ],
   "scripts": {

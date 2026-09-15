@@ -2,7 +2,7 @@
 
 The bundled native files were copied from the focused upstream package at
 `IgorWarzocha/howaboua-pi-stuff` revision
-`4593f066d447925eae8e3106435f117236690f9`. The per-platform SHA-256 records
+`4593f066d447925eae8e3106435f117236690f9e`. The per-platform SHA-256 records
 for `apply_patch` live beside each binary in `src/tools/apply-patch/bin/`.
 No local rebuild or reproducible-build claim is made here.
 
