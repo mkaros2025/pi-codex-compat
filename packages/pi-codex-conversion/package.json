@@ -1,59 +1,23 @@
 {
-  "name": "@howaboua/pi-codex-conversion",
-  "version": "3.0.34",
-  "description": "Codex-oriented tool and prompt adapter for pi coding agent",
+  "name": "pi-codex-tools",
+  "version": "0.1.0",
+  "description": "Four Codex-compatible tools for Pi with model-based activation",
+  "keywords": ["pi-package", "pi", "codex"],
   "type": "module",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IgorWarzocha/howaboua-pi-stuff.git",
+    "url": "git+https://github.com/mkaros2025/pi-codex-tools.git",
     "directory": "packages/pi-codex-conversion"
   },
-  "homepage": "https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/main/packages/pi-codex-conversion#readme",
-  "bugs": {
-    "url": "https://github.com/IgorWarzocha/howaboua-pi-stuff/issues"
-  },
-  "keywords": [
-    "pi-package",
-    "pi",
-    "pi-coding-agent",
-    "extension",
-    "codex",
-    "adapter",
-    "apply-patch"
-  ],
-  "license": "MIT",
+  "homepage": "https://github.com/mkaros2025/pi-codex-tools",
   "main": "./dist/index.js",
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./code-mode-hooks": {
-      "types": "./dist/code-mode-hooks.d.ts",
-      "import": "./dist/code-mode-hooks.js"
-    },
-    "./code-mode-preflight": {
-      "types": "./dist/code-mode-preflight.d.ts",
-      "import": "./dist/code-mode-preflight.js"
-    },
-    "./code-mode": {
-      "types": "./dist/code-mode.d.ts",
-      "import": "./dist/code-mode.js"
-    },
-    "./developer-messages": {
-      "types": "./dist/developer-messages.d.ts",
-      "import": "./dist/developer-messages.js"
-    },
-    "./apply-patch-display": {
-      "types": "./dist/apply-patch-display.d.ts",
-      "import": "./dist/apply-patch-display.js"
-    },
-    "./realtime-voice": {
-      "types": "./dist/realtime-voice.d.ts",
-      "import": "./dist/realtime-voice.js"
-    },
-    "./*": "./*"
+    }
   },
   "pi": {
     "extensions": [
@@ -64,78 +28,39 @@
     "dist/**/*.js",
     "dist/**/*.d.ts",
     "src/**/*.ts",
-    "src/**/*.md",
-    "types/**/*.d.ts",
-    "src/voice/lan/assets/**",
-    "vendor/tree-sitter-bash/**",
-    "vendor/js-tiktoken/**",
-    "examples/code-mode-extension",
-    "examples/custom-tools",
-    "CHANGELOG.md",
-    "README.md",
-    "UPSTREAM_SYNC.md",
-    "LICENSE",
     "src/tools/**/bin/**",
-    "src/voice/bin/**",
-    "code-mode/UPSTREAM_SYNC.md",
-    "code-mode/vendor/code-mode-src/LICENSE",
-    "code-mode/vendor/code-mode-src/NOTICE",
-    "code-mode/vendor/code-mode-src/UPSTREAM",
-    "scripts/code-mode",
-    "!src/**/AGENTS.md",
-    "!src/tools/target/**",
-    "changelog.ts",
-    "changelog.js"
+    "README.md",
+    "LICENSE",
+    "LICENSE-APACHE-2.0",
+    "NOTICE",
+    "UPSTREAM-NATIVE.md"
   ],
   "scripts": {
-    "build": "node -e \"const fs=require('node:fs'); fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('changelog.js', { force: true })\" && tsc -p tsconfig.build.json && node ../../scripts/build-extension-changelog.mjs .",
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "tsx --test tests/**/*.test.ts examples/custom-tools/browser/*.test.mjs",
-    "check": "node ../../scripts/sync-browser-cdp.mjs --check && bun run typecheck && bun run test",
-    "publish:dry-run": "npm publish --dry-run",
-    "publish:dev": "npm publish --tag dev",
-    "release:dev": "npm version prerelease --preid dev && npm publish --tag dev",
-    "prepack": "bun run check && bun run build",
-    "prepare": "bun run build",
-    "prepublishOnly": "bun run verify:extension-artifact && bun run verify:codex-tool-binaries && bun run verify:code-mode-host-assets",
-    "verify:extension-artifact": "node ../../scripts/verify-pi-extension-artifact.mjs --no-build packages/pi-codex-conversion",
-    "build:apply-patch": "node scripts/build-apply-patch-binary.mjs",
-    "sync:apply-patch-source": "node scripts/sync-apply-patch-source.mjs",
-    "verify:codex-tool-binaries": "node scripts/verify-codex-tool-binaries.mjs",
-    "build:changed-native-tools": "node scripts/build-changed-native-tool-binaries.mjs",
-    "build:native-tool": "node scripts/build-native-tool-binary.mjs",
-    "build:code-mode-host": "node scripts/code-mode/build-host.mjs",
-    "build:voice-helper": "node scripts/build-voice-helper.mjs",
-    "verify:code-mode-host-assets": "node scripts/code-mode/verify-host-assets.mjs"
-  },
-  "publishConfig": {
-    "access": "public"
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test",
+    "pack:dry": "npm pack --dry-run",
+    "prepack": "npm run build"
   },
   "peerDependencies": {
-    "@earendil-works/pi-ai": ">=0.84.3",
-    "@earendil-works/pi-coding-agent": ">=0.84.4",
-    "@earendil-works/pi-tui": ">=0.84.3",
-    "typebox": "*"
+    "@earendil-works/pi-coding-agent": ">=0.85.0",
+    "@gotgenes/pi-permission-system": ">=32.0.0"
   },
-  "devDependencies": {
-    "@earendil-works/pi-agent-core": "0.85.1",
-    "@earendil-works/pi-ai": "0.85.1",
-    "@earendil-works/pi-coding-agent": "0.85.1",
-    "@earendil-works/pi-tui": "0.85.1",
-    "@types/ws": "^8.18.1",
-    "tsx": "^4.23.13",
-    "typebox": "1.3.29",
-    "typescript": "^7.0.2"
+  "peerDependenciesMeta": {
+    "@gotgenes/pi-permission-system": {
+      "optional": true
+    }
   },
   "dependencies": {
-    "openai": "7.10.0",
-    "partial-json": "^0.1.7",
-    "proxy-from-env": "2.1.0",
-    "selfsigned": "^5.5.0",
-    "smol-toml": "^1.8.0",
-    "undici": "8.10.2",
-    "web-tree-sitter": "^0.27.0",
-    "ws": "^8.21.3"
+    "jiti": "^2.7.0",
+    "typebox": "^1.3.29"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.85.1",
+    "@types/node": "^26.0.0",
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.0"
   },
   "engines": {
     "node": ">=22.19.0"

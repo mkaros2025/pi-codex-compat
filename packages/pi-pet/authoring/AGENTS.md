@@ -1,2 +1,0 @@
-- `PET-GUIDE.md` routes on-demand `/pet` requests; no authoring guide is registered as an always-visible Pi skill.
-- Machine-readable action truth remains in the pet catalog; keep conditional detail in references.

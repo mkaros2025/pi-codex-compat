@@ -1,16 +1,16 @@
 {
-  "schemaVersion": 1,
-  "source": {
-    "repository": "openai/codex",
-    "revision": "c4017a87aacc7558002b7cb510025e967c1d765e",
-    "inputsSha256": "6f98a62ec191bcaa2467d9ac52fcfa1cf06714ca45040639011447451c292854"
-  },
+  "schemaVersion": 2,
   "binary": {
-    "sha256": "60f75c9bd95454912e91d4bfa2c5dfb9c4cf4d4e441b117f8737e5acf7d6efec"
+    "sha256": "60f75c9bd95454912e91d4bfa2c5dfb9c4cf4d4e441b117f8737e5acf7d6efec",
+    "copiedFrom": {
+      "repository": "IgorWarzocha/howaboua-pi-stuff",
+      "revision": "4593f066d447925eae8e3106435f117236690f9e",
+      "path": "packages/pi-codex-conversion/src/tools/apply-patch/bin/win32-x64/apply_patch.exe"
+    }
   },
-  "build": {
-    "target": "x86_64-pc-windows-msvc",
-    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
-    "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)"
-  }
+  "knownUpstreamSource": {
+    "repository": "openai/codex",
+    "revision": "c4017a87aacc7558002b7cb510025e967c1d765e"
+  },
+  "target": "x86_64-pc-windows-msvc"
 }

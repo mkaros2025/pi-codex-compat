@@ -3,82 +3,24 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import {
-	createEventBus,
-	type ExtensionAPI,
-} from "@earendil-works/pi-coding-agent";
-import { registerApplyPatchDisplay } from "../src/apply-patch-display.ts";
-import { registerApplyPatchDisplayBroker } from "../src/tools/apply-patch/display-broker.ts";
-import { createApplyPatchTool } from "../src/tools/apply-patch/tool.ts";
+import { createApplyPatchTool, registerApplyPatchResultHook } from "../src/tools/apply-patch/tool.ts";
 
-function displayExtensionApi(bus = createEventBus()) {
-	const handlers = new Map<string, Array<(event: never) => unknown>>();
-	const entries: Array<{ customType: string; data: unknown }> = [];
-	const pi = {
-		events: { emit: bus.emit, on: bus.on },
-		registerEntryRenderer() {},
-		on(event: string, handler: (event: never) => unknown) {
-			const eventHandlers = handlers.get(event) ?? [];
-			eventHandlers.push(handler);
-			handlers.set(event, eventHandlers);
-		},
-		appendEntry(customType: string, data: unknown) {
-			entries.push({ customType, data });
-		},
-	} as unknown as ExtensionAPI;
-	return {
-		pi,
-		entries,
-		emit(event: string, value: unknown = {}) {
-			return (handlers.get(event) ?? []).map((handler) =>
-				handler(value as never),
-			);
-		},
-	};
-}
-
-test("apply_patch preserves display routing and rejects duplicate resolved sources before mutation", async () => {
-	const bus = createEventBus();
-	const consumer = displayExtensionApi(bus);
-	const registration = registerApplyPatchDisplay(consumer.pi, {
-		customType: "test-apply-patch-display",
-		render: (() => undefined) as never,
-	});
-	const conversion = displayExtensionApi(bus);
-	registerApplyPatchDisplayBroker(conversion.pi);
-	assert.equal(registration.available, true);
-	conversion.emit("tool_result", {
-		toolName: "apply_patch",
-		toolCallId: "direct-1",
-		input: { input: "*** Begin Patch\n*** End Patch" },
-		content: [{ type: "text", text: "Applied direct" }],
-		isError: false,
-	});
-	assert.deepEqual(conversion.entries, []);
-	conversion.emit("turn_end");
-	assert.deepEqual(conversion.entries, [
-		{
-			customType: "test-apply-patch-display",
-			data: {
-				toolCallId: "direct-1",
-				input: "*** Begin Patch\n*** End Patch",
-				content: "Applied direct",
-				isError: false,
-				source: "direct",
-			},
-		},
-	]);
-
-	const cwd = await mkdtemp(join(tmpdir(), "pi-apply-patch-duplicate-"));
-	const path = join(cwd, "duplicate.txt");
-	const original = "top\nmiddle\nbottom\n";
-	await writeFile(path, original);
-	const tool = createApplyPatchTool();
-	const duplicateAlias =
-		process.platform === "win32" ? "./DUPLICATE.txt" : "./duplicate.txt";
-
-	try {
-		const duplicatePatch = `*** Begin Patch
+test("apply_patch rejects duplicate sources and applies multiple hunks", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "pi-apply-patch-"));
+  const path = join(cwd, "duplicate.txt");
+  const original = "top\nmiddle\nbottom\n";
+  await writeFile(path, original);
+  const tool = createApplyPatchTool();
+  const context = {
+    cwd,
+    hasUI: false,
+    ui: { confirm: async () => false },
+    isProjectTrusted: () => false,
+    sessionManager: { getSessionId: () => "test" },
+  } as never;
+  try {
+    const duplicateAlias = process.platform === "win32" ? "./DUPLICATE.txt" : "./duplicate.txt";
+    const duplicatePatch = `*** Begin Patch
 *** Update File: duplicate.txt
 @@
 -top
@@ -87,26 +29,14 @@ test("apply_patch preserves display routing and rejects duplicate resolved sourc
 @@
 -top
 +second update
-  *** End Patch`;
-		await assert.rejects(
-			tool.execute(
-				"duplicate",
-				{ input: duplicatePatch },
-				undefined,
-				undefined,
-				{ cwd } as never,
-			),
-			(error: unknown) => {
-				assert.match(
-					error instanceof Error ? error.message : String(error),
-					/multiple file sections resolve to .*duplicate\.txt.*multiple @@ hunks/i,
-				);
-				return true;
-			},
-		);
-		assert.equal(await readFile(path, "utf8"), original);
+*** End Patch`;
+    await assert.rejects(
+      tool.execute("duplicate", { input: duplicatePatch }, undefined, undefined, context),
+      /multiple file sections resolve to .*duplicate\.txt/i,
+    );
+    assert.equal(await readFile(path, "utf8"), original);
 
-		const multipleHunksPatch = `*** Begin Patch
+    const multipleHunksPatch = `*** Begin Patch
 *** Update File: duplicate.txt
 @@
 -top
@@ -115,21 +45,41 @@ test("apply_patch preserves display routing and rejects duplicate resolved sourc
 -bottom
 +updated bottom
 *** End Patch`;
-		const result = await tool.execute(
-			"multiple-hunks",
-			{ input: multipleHunksPatch },
-			undefined,
-			undefined,
-			{ cwd } as never,
-		);
-		assert.equal(result.details.status, "success");
-		assert.equal(
-			await readFile(path, "utf8"),
-			"updated top\nmiddle\nupdated bottom\n",
-		);
-	} finally {
-		await rm(cwd, { recursive: true, force: true });
-		registration.dispose();
-		conversion.emit("session_shutdown");
-	}
+    const result = await tool.execute("multiple-hunks", { input: multipleHunksPatch }, undefined, undefined, context);
+    assert.equal((result.details as { status: string }).status, "success");
+    assert.equal(await readFile(path, "utf8"), "updated top\nmiddle\nupdated bottom\n");
+
+    const secondPath = join(cwd, "second.txt");
+    await writeFile(secondPath, "second\n");
+    const partialPatch = `*** Begin Patch
+*** Update File: duplicate.txt
+@@
+-updated top
++partially updated
+*** Update File: second.txt
+@@
+-not present
++failed
+*** End Patch`;
+    const partial = await tool.execute("partial", { input: partialPatch }, undefined, undefined, context);
+    const partialResult = partial as unknown as { details: { status: string } };
+    assert.equal(partialResult.details.status, "partial_failure");
+    assert.equal(await readFile(path, "utf8"), "partially updated\nmiddle\nupdated bottom\n");
+    assert.equal(await readFile(secondPath, "utf8"), "second\n");
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test("apply_patch marks partial results as errors through Pi's result hook", () => {
+  let handler: ((event: never, ctx: never) => unknown) | undefined;
+  registerApplyPatchResultHook({
+    on(_event: never, next: (event: never, ctx: never) => unknown) { handler = next; },
+  } as never);
+  assert.deepEqual(
+    handler?.({ toolName: "apply_patch", details: { status: "partial_failure" } } as never, undefined as never),
+    { isError: true },
+  );
+  assert.equal(handler?.({ toolName: "apply_patch", details: { status: "success" } } as never, undefined as never), undefined);
+  assert.equal(handler?.({ toolName: "other", details: { status: "partial_failure" } } as never, undefined as never), undefined);
 });

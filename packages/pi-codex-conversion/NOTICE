@@ -1,0 +1,23 @@
+pi-codex-tools notices
+
+MIT-licensed adapter
+--------------------
+The TypeScript adapter is derived from pi-codex-conversion by Igor Warzocha
+at the fixed upstream revision:
+https://github.com/IgorWarzocha/howaboua-pi-stuff/tree/4593f066d447925eae8e3106435f117236690f9e/packages/pi-codex-conversion
+See LICENSE.
+
+Apache-licensed native binaries
+-------------------------------
+The bundled apply_patch, exec_bridge, and view_image binaries are derived
+from OpenAI Codex (Copyright 2025 OpenAI), licensed under Apache License 2.0.
+See LICENSE-APACHE-2.0 and UPSTREAM-NATIVE.md.
+
+OpenAI Codex NOTICE attribution
+--------------------------------
+OpenAI Codex
+Copyright 2025 OpenAI
+
+This project includes code derived from Ratatui, licensed under the MIT license.
+Copyright (c) 2016-2022 Florian Dehau
+Copyright (c) 2023-2025 The Ratatui Developers

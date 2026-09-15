@@ -1,5 +1,5 @@
 import { StringDecoder } from "node:string_decoder";
-import { getCodexShellArgs } from "../../adapter/prompt/runtime-shell.ts";
+import { getShellArgs } from "../../runtime-shell.ts";
 import { chunkToBytes, createExecBridgeClient, type BridgeReadResponse } from "./bridge-client.ts";
 
 const EXIT_OUTPUT_GRACE_MS = 100;
@@ -162,7 +162,7 @@ export function createBridgeSessionRuntime(binaryPath?: () => string | undefined
 		};
 		session.startup = (async () => {
 			try {
-				const shellArgs = getCodexShellArgs(shell, input.executionCommand, input.login ?? true);
+				const shellArgs = getShellArgs(shell, input.executionCommand, input.login ?? true);
 				await bridge.request({
 					op: "exec",
 					process_id: session.processId,

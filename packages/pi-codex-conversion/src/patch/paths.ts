@@ -3,9 +3,7 @@ import { isAbsolute, resolve } from "node:path";
 import { DiffError } from "./types.ts";
 
 export function normalizePatchPath({ path }: { path: string }): string {
-	const trimmed = path.trim();
-	const withoutAt = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
-	return withoutAt.replace(/^['"]|['"]$/g, "");
+	return path.trim();
 }
 
 // Match Codex apply_patch path handling: absolute patch paths are accepted

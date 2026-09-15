@@ -1,13 +1,4 @@
-node_modules
-.DS_Store
+node_modules/
+dist/
 *.tgz
-.afreet/
-pulses/
-vault/
-.pi/*
-!.pi/skills/
-!.pi/skills/**
-!.pi/prompts/
-!.pi/prompts/**
-!.pi/codex-conversion-custom-tools/
-!.pi/codex-conversion-custom-tools/**
+.DS_Store

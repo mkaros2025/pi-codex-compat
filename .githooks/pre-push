@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-set -eu
-
-if [ "${SKIP_HOOKS:-}" = "1" ] || [ "${SKIP_CHANGESET_CHECK:-}" = "1" ]; then
-  echo "Skipping changeset check."
-  exit 0
-fi
-
-bun run scripts/require-changeset.mjs origin/main
