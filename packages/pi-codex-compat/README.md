@@ -29,18 +29,20 @@ Configuration is independent of other extensions:
 }
 ```
 
-Global config: `~/.pi/agent/pi-codex-tools.json`
-Trusted project config: `<project>/.pi/pi-codex-tools.json`
+Global config: `~/.pi/agent/pi-codex-compat.json`
+Trusted project config: `<project>/.pi/pi-codex-compat.json`
 
 A trusted project file overrides the global values. Untrusted project files are
-ignored. Use `/codex-tools` to inspect settings, or:
+ignored. Existing `pi-codex-tools.json` files are read as legacy config when
+the new file is absent; writes go to the new compat filename. Use
+`/codex-compat` to inspect settings, or:
 
 ```text
-/codex-tools auto
-/codex-tools on
-/codex-tools off
-/codex-tools prefixes gpt,o3
-/codex-tools project auto
+/codex-compat auto
+/codex-compat on
+/codex-compat off
+/codex-compat prefixes gpt,o3
+/codex-compat project auto
 ```
 
 ## Permission system
@@ -72,7 +74,7 @@ review `exec_command` before allowing additional input.
 ## Install from this repository
 
 ```bash
-pi install git:github.com/mkaros2025/pi-codex-tools
+pi install git:github.com/mkaros2025/pi-codex-compat
 ```
 
 The Git installation loads the tracked TypeScript source directly. The npm

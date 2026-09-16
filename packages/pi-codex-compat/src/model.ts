@@ -1,4 +1,4 @@
-import type { CodexToolsConfig } from "./config.ts";
+import type { CodexCompatConfig } from "./config.ts";
 
 export interface ModelLike {
   id?: string | undefined;
@@ -6,7 +6,7 @@ export interface ModelLike {
 
 export function shouldActivate(
   model: ModelLike | undefined,
-  config: CodexToolsConfig,
+  config: CodexCompatConfig,
 ): boolean {
   switch (config.mode) {
     case "on":

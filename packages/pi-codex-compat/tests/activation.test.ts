@@ -31,14 +31,14 @@ function context(cwd: string, model: { id: string }) {
 }
 
 test("model changes replace and restore only the native tool set", async () => {
-  const agentDir = await mkdtemp(join(tmpdir(), "pi-codex-tools-agent-"));
+  const agentDir = await mkdtemp(join(tmpdir(), "pi-codex-compat-agent-"));
   const previousAgentDir = process.env["PI_CODING_AGENT_DIR"];
   process.env["PI_CODING_AGENT_DIR"] = agentDir;
   try {
-    const { default: piCodexTools, CODEX_TOOL_NAMES } = await import("../src/index.ts");
+    const { default: piCodexCompat, CODEX_COMPAT_TOOL_NAMES } = await import("../src/index.ts");
     const testHarness = harness(["read", "bash", "write", "other-extension"]);
-    piCodexTools(testHarness.pi as never);
-    assert.deepEqual([...testHarness.registered], CODEX_TOOL_NAMES);
+    piCodexCompat(testHarness.pi as never);
+    assert.deepEqual([...testHarness.registered], CODEX_COMPAT_TOOL_NAMES);
     assert.deepEqual(
       testHarness.emit("tool_result", { toolName: "apply_patch", details: { status: "partial_failure" } }, {}),
       [{ isError: true }],
@@ -52,11 +52,11 @@ test("model changes replace and restore only the native tool set", async () => {
     assert.deepEqual(testHarness.pi.getActiveTools(), ["read", "bash", "write", "other-extension"]);
 
     testHarness.emit("model_select", { model: { id: "gpt-5" } }, context(agentDir, { id: "gpt-5" }));
-    assert.deepEqual(testHarness.pi.getActiveTools(), [...CODEX_TOOL_NAMES, "other-extension"]);
+    assert.deepEqual(testHarness.pi.getActiveTools(), [...CODEX_COMPAT_TOOL_NAMES, "other-extension"]);
 
-    testHarness.pi.setActiveTools([...CODEX_TOOL_NAMES, "other-extension", "edit"]);
+    testHarness.pi.setActiveTools([...CODEX_COMPAT_TOOL_NAMES, "other-extension", "edit"]);
     testHarness.emit("model_select", { model: { id: "gpt-5" } }, context(agentDir, { id: "gpt-5" }));
-    assert.deepEqual(testHarness.pi.getActiveTools(), [...CODEX_TOOL_NAMES, "other-extension"]);
+    assert.deepEqual(testHarness.pi.getActiveTools(), [...CODEX_COMPAT_TOOL_NAMES, "other-extension"]);
 
     testHarness.emit("model_select", { model: { id: "claude-3" } }, context(agentDir, { id: "claude-3" }));
     assert.deepEqual(testHarness.pi.getActiveTools(), ["other-extension", "read", "bash", "write", "edit"]);

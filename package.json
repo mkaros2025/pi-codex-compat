@@ -14,7 +14,7 @@
   ],
   "pi": {
     "extensions": [
-      "./packages/pi-codex-conversion/src/index.ts"
+      "./packages/pi-codex-compat/src/index.ts"
     ]
   },
   "scripts": {

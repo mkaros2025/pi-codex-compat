@@ -7,10 +7,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkaros2025/pi-codex-tools.git",
-    "directory": "packages/pi-codex-conversion"
+    "url": "git+https://github.com/mkaros2025/pi-codex-compat.git",
+    "directory": "packages/pi-codex-compat"
   },
-  "homepage": "https://github.com/mkaros2025/pi-codex-tools",
+  "homepage": "https://github.com/mkaros2025/pi-codex-compat",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

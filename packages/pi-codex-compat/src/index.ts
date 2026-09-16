@@ -5,18 +5,18 @@ import { createExecCommandTool } from "./tools/exec/command-tool.ts";
 import { createWriteStdinTool } from "./tools/exec/write-stdin-tool.ts";
 import { createViewImageTool } from "./tools/view-image/tool.ts";
 import {
-  DEFAULT_CODEX_TOOLS_CONFIG,
+  DEFAULT_CODEX_COMPAT_CONFIG,
   getGlobalConfigPath,
   getProjectConfigPath,
   readEffectiveConfig,
   writeConfig,
   type ConfigScope,
-  type CodexToolsMode,
+  type CodexCompatMode,
 } from "./config.ts";
 import { shouldActivate } from "./model.ts";
 import { createPermissionBridge } from "./permissions.ts";
 
-export const CODEX_TOOL_NAMES = [
+export const CODEX_COMPAT_TOOL_NAMES = [
   "exec_command",
   "write_stdin",
   "apply_patch",
@@ -24,7 +24,7 @@ export const CODEX_TOOL_NAMES = [
 ] as const;
 
 const NATIVE_TOOL_NAMES = new Set(["read", "bash", "edit", "write"]);
-const OWNED_TOOL_NAMES = new Set<string>(CODEX_TOOL_NAMES);
+const OWNED_TOOL_NAMES = new Set<string>(CODEX_COMPAT_TOOL_NAMES);
 
 interface ActivationState {
   enabled: boolean;
@@ -46,7 +46,7 @@ function enableTools(pi: ExtensionAPI, state: ActivationState): void {
   const otherTools = currentTools.filter(
     (name) => !NATIVE_TOOL_NAMES.has(name) && !OWNED_TOOL_NAMES.has(name),
   );
-  setActiveTools(pi, [...CODEX_TOOL_NAMES, ...otherTools]);
+  setActiveTools(pi, [...CODEX_COMPAT_TOOL_NAMES, ...otherTools]);
 }
 
 function disableTools(pi: ExtensionAPI, state: ActivationState): void {
@@ -86,7 +86,7 @@ function sync(pi: ExtensionAPI, ctx: ExtensionContext, state: ActivationState, m
   else disableTools(pi, state);
 }
 
-export default function piCodexTools(pi: ExtensionAPI): void {
+export default function piCodexCompat(pi: ExtensionAPI): void {
   const permissionBridge = createPermissionBridge(pi);
   const sessions = createExecSessionManager();
   pi.registerTool(createExecCommandTool(sessions));
@@ -106,7 +106,7 @@ export default function piCodexTools(pi: ExtensionAPI): void {
     await sessions.shutdown();
   });
 
-  pi.registerCommand("codex-tools", {
+  pi.registerCommand("codex-compat", {
     description: "Configure Codex tool activation",
     handler: async (args, ctx) => {
       const command = parseCommand(args);
@@ -124,7 +124,7 @@ export default function piCodexTools(pi: ExtensionAPI): void {
         return;
       }
       const patch = command.action === "mode"
-        ? { mode: command.value as CodexToolsMode }
+        ? { mode: command.value as CodexCompatMode }
         : { modelPrefixes: command.value!.split("\n") };
       const result = writeConfig(command.scope, patch, {
         cwd: ctx.cwd,
@@ -141,7 +141,7 @@ export default function piCodexTools(pi: ExtensionAPI): void {
 }
 
 export {
-  DEFAULT_CODEX_TOOLS_CONFIG,
+  DEFAULT_CODEX_COMPAT_CONFIG,
   readEffectiveConfig,
   shouldActivate,
   writeConfig,
