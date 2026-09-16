@@ -79,7 +79,7 @@ package uses its compiled `dist` entrypoint.
 After publishing the npm package:
 
 ```bash
-pi install npm:@mkaros2025/pi-codex-compat
+pi install npm:@mkaros/pi-codex-compat
 ```
 
 Native helpers are bundled for Linux, macOS and Windows on x64 and arm64.

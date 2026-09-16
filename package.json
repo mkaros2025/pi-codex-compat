@@ -18,9 +18,9 @@
     ]
   },
   "scripts": {
-    "check": "npm run --workspace=@mkaros2025/pi-codex-compat check",
-    "typecheck": "npm run --workspace=@mkaros2025/pi-codex-compat typecheck",
-    "test": "npm run --workspace=@mkaros2025/pi-codex-compat test",
-    "build": "npm run --workspace=@mkaros2025/pi-codex-compat build"
+    "check": "npm run --workspace=@mkaros/pi-codex-compat check",
+    "typecheck": "npm run --workspace=@mkaros/pi-codex-compat typecheck",
+    "test": "npm run --workspace=@mkaros/pi-codex-compat test",
+    "build": "npm run --workspace=@mkaros/pi-codex-compat build"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@mkaros2025/pi-codex-compat",
+  "name": "@mkaros/pi-codex-compat",
   "version": "0.1.0",
   "description": "Four Codex-compatible tools for Pi with model-based activation",
   "keywords": ["pi-package", "pi", "codex"],

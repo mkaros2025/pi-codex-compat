@@ -21,7 +21,7 @@ package uses its compiled `dist` entrypoint.
 After publishing the npm package:
 
 ```bash
-pi install npm:@mkaros2025/pi-codex-compat
+pi install npm:@mkaros/pi-codex-compat
 ```
 
 See [`packages/pi-codex-compat/README.md`](./packages/pi-codex-compat/README.md).
