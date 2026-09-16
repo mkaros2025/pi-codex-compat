@@ -225,7 +225,7 @@ export async function openSettingsPanel(
         tui.requestRender();
       },
     };
-  }, { overlay: true, overlayOptions: { width: "70%", maxHeight: "80%", margin: 2 } });
+  });
 
   return result ?? { kind: "cancelled" };
 }

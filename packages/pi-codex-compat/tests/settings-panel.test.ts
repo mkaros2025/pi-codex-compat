@@ -23,9 +23,11 @@ function options(save: (value: CodexCompatConfig) => { ok: true; path: string } 
 test("TUI panel shows settings and saves the global draft", async () => {
   let component: PanelComponent | undefined;
   let resolved: SettingsPanelResult | undefined;
+  let customOptions: unknown;
   const saved: CodexCompatConfig[] = [];
   const ui = {
-    custom: async (factory: (tui: unknown, theme: unknown, keybindings: unknown, done: (value: SettingsPanelResult) => void) => PanelComponent) => {
+    custom: async (factory: (tui: unknown, theme: unknown, keybindings: unknown, done: (value: SettingsPanelResult) => void) => PanelComponent, options?: unknown) => {
+      customOptions = options;
       component = factory(
         { requestRender() {} },
         { fg: (_color: string, text: string) => text, bold: (text: string) => text },
@@ -49,6 +51,7 @@ test("TUI panel shows settings and saves the global draft", async () => {
       return { ok: true, path: "/tmp/pi-codex-compat.json" };
     }),
   );
+  assert.equal(customOptions, undefined);
   assert.deepEqual(result, { kind: "saved", config, path: "/tmp/pi-codex-compat.json" });
   assert.deepEqual(saved, [config]);
 });
