@@ -96,7 +96,7 @@ test("model changes replace and restore only the native tool set", async () => {
   }
 });
 
-test("the settings command applies a saved mode without removing other tools", async () => {
+test("the settings command applies an immediate mode change without removing other tools", async () => {
   const agentDir = await mkdtemp(join(tmpdir(), "pi-codex-compat-command-"));
   const previousAgentDir = process.env["PI_CODING_AGENT_DIR"];
   process.env["PI_CODING_AGENT_DIR"] = agentDir;
@@ -113,9 +113,7 @@ test("the settings command applies a saved mode without removing other tools", a
       hasUI: true,
       ui: panelUi((panel) => {
         panel.handleInput("\r");
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\r");
+        panel.handleInput("\u001b");
       }),
     });
 
@@ -134,7 +132,7 @@ test("the settings command applies a saved mode without removing other tools", a
   }
 });
 
-test("cancelled or failed settings saves leave the active tools unchanged", async () => {
+test("Esc exits and failed settings changes leave the active tools unchanged", async () => {
   const root = await mkdtemp(join(tmpdir(), "pi-codex-compat-command-"));
   const previousAgentDir = process.env["PI_CODING_AGENT_DIR"];
   const initialTools = ["read", "bash", "write", "other-extension"];
@@ -152,10 +150,7 @@ test("cancelled or failed settings saves leave the active tools unchanged", asyn
       mode: "tui",
       hasUI: true,
       ui: panelUi((panel) => {
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\r");
+        panel.handleInput("\u001b");
       }),
     });
     assert.deepEqual(cancelledHarness.pi.getActiveTools(), initialTools);
@@ -172,8 +167,6 @@ test("cancelled or failed settings saves leave the active tools unchanged", asyn
       mode: "tui",
       hasUI: true,
       ui: panelUi((panel) => {
-        panel.handleInput("\u001b[B");
-        panel.handleInput("\u001b[B");
         panel.handleInput("\r");
         panel.handleInput("\u001b");
       }),

@@ -112,16 +112,12 @@ export default function piCodexCompat(pi: ExtensionAPI): void {
         return;
       }
       if (command.action === "panel") {
-        const result = await openSettingsPanel(ctx, {
+        await openSettingsPanel(ctx, {
           config: readEffectiveConfig(),
           model: ctx.model,
-          activeToolCount: pi.getActiveTools().filter((name) => OWNED_TOOL_NAMES.has(name)).length,
           save: (config) => writeConfig(config),
+          apply: () => sync(pi, ctx, state, ctx.model),
         });
-        if (result.kind === "saved") {
-          sync(pi, ctx, state);
-          ctx.ui.notify(`Saved ${result.path}`, "info");
-        }
         return;
       }
       if (command.action === "show") {

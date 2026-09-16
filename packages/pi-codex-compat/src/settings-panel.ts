@@ -23,13 +23,9 @@ type SaveResult =
 export interface SettingsPanelOptions {
   config: CodexCompatConfig;
   model: ModelLike | undefined;
-  activeToolCount: number;
   save: (config: CodexCompatConfig) => SaveResult;
+  apply: (config: CodexCompatConfig) => void;
 }
-
-export type SettingsPanelResult =
-  | { kind: "saved"; config: CodexCompatConfig; path: string }
-  | { kind: "cancelled" };
 
 function parsePrefixes(value: string): string[] {
   return value.split(/[\s,]+/).map((prefix) => prefix.trim()).filter(Boolean);
@@ -53,14 +49,13 @@ function statusText(
   theme: Pick<Theme, "fg" | "bold">,
   model: ModelLike | undefined,
   config: CodexCompatConfig,
-  activeToolCount: number,
 ): string {
   const modelId = model?.id ?? "(none)";
-  const desired = shouldActivate(model, config) ? "enabled" : "disabled";
+  const activation = shouldActivate(model, config) ? "enabled" : "disabled";
   return [
     theme.fg("accent", theme.bold("Pi Codex Compat")),
     `Model: ${modelId}`,
-    `Current tools: ${activeToolCount}/4` + ` · after save: ${desired}`,
+    `Activation: ${activation}`,
     `Mode: ${config.mode} · Prefixes: ${formatPrefixes(config.modelPrefixes) || "(none)"}`,
   ].join("\n");
 }
@@ -70,6 +65,7 @@ function prefixEditor(
   theme: Pick<Theme, "fg">,
   currentValue: string,
   done: (selectedValue?: string) => void,
+  exit: () => void,
 ): Component {
   const input = new Input({ prompt: "Prefixes: ", placeholder: "gpt,o3" });
   input.setValue(currentValue);
@@ -88,7 +84,7 @@ function prefixEditor(
     }
     done(formatPrefixes(prefixes));
   };
-  input.onEscape = () => done();
+  input.onEscape = exit;
 
   const container = new Container();
   container.addChild(new Text(theme.fg("dim", "Enter prefixes separated by commas. Blank disables auto matching.")));
@@ -112,41 +108,50 @@ function prefixEditor(
 function openDialogPanel(
   ctx: ExtensionContext,
   options: SettingsPanelOptions,
-): Promise<SettingsPanelResult> {
-  if (!ctx.hasUI) return Promise.resolve({ kind: "cancelled" });
+): Promise<void> {
+  if (!ctx.hasUI) return Promise.resolve();
   return (async () => {
     const mode = await ctx.ui.select("Codex Compat · Activation mode", [...MODE_VALUES]);
-    if (mode === undefined) return { kind: "cancelled" };
+    if (mode === undefined) return;
+    const draft = normalizeConfig({ ...options.config, mode });
+    const modeResult = options.save(draft);
+    if (!modeResult.ok) {
+      ctx.ui.notify(modeResult.error, "error");
+      return;
+    }
+    options.apply(draft);
+
     const prefixes = await ctx.ui.input(
       "Codex Compat · Model prefixes",
-      formatPrefixes(options.config.modelPrefixes),
+      formatPrefixes(draft.modelPrefixes),
     );
-    if (prefixes === undefined) return { kind: "cancelled" };
-    const action = await ctx.ui.select("Save Codex Compat settings?", ["Save", "Cancel"]);
-    if (action !== "Save") return { kind: "cancelled" };
+    if (prefixes === undefined) return;
 
-    const config = normalizeConfig({ mode, modelPrefixes: parsePrefixes(prefixes) });
-    const result = options.save(config);
-    if (!result.ok) {
-      ctx.ui.notify(result.error, "error");
-      return { kind: "cancelled" };
+    const config = normalizeConfig({ ...draft, modelPrefixes: parsePrefixes(prefixes) });
+    const prefixResult = options.save(config);
+    if (!prefixResult.ok) {
+      ctx.ui.notify(prefixResult.error, "error");
+      return;
     }
-    return { kind: "saved", config, path: result.path };
+    options.apply(config);
   })();
 }
 
 export async function openSettingsPanel(
   ctx: ExtensionContext,
   options: SettingsPanelOptions,
-): Promise<SettingsPanelResult> {
-  if (ctx.mode !== "tui") return openDialogPanel(ctx, options);
+): Promise<void> {
+  if (ctx.mode !== "tui") {
+    await openDialogPanel(ctx, options);
+    return;
+  }
 
-  const result = await ctx.ui.custom<SettingsPanelResult>((tui, theme, _keybindings, done) => {
+  await ctx.ui.custom<void>((tui, theme, _keybindings, done) => {
     const draft = normalizeConfig(options.config);
-    const status = new Text(statusText(theme, options.model, draft, options.activeToolCount));
+    const status = new Text(statusText(theme, options.model, draft));
     const errorText = new Text();
     const updateStatus = () => {
-      status.setText(statusText(theme, options.model, draft, options.activeToolCount));
+      status.setText(statusText(theme, options.model, draft));
       tui.requestRender();
     };
 
@@ -163,21 +168,7 @@ export async function openSettingsPanel(
         label: "Model prefixes",
         description: "Models beginning with one of these prefixes activate in auto mode.",
         currentValue: formatPrefixes(draft.modelPrefixes),
-        submenu: (currentValue, close) => prefixEditor(tui, theme, currentValue, close),
-      },
-      {
-        id: "save",
-        label: "Save and apply",
-        description: "Write the global config and apply the selected activation mode now.",
-        currentValue: "Enter",
-        values: ["Enter"],
-      },
-      {
-        id: "cancel",
-        label: "Cancel",
-        description: "Close without changing the global config.",
-        currentValue: "Enter",
-        values: ["Enter"],
+        submenu: (currentValue, close) => prefixEditor(tui, theme, currentValue, close, () => done()),
       },
     ];
 
@@ -186,30 +177,32 @@ export async function openSettingsPanel(
     container.addChild(new Text(""));
     container.addChild(errorText);
 
-    const settings = new SettingsList(
+    let settings: SettingsList | undefined;
+    settings = new SettingsList(
       items,
       items.length,
       settingsListTheme(theme),
       (id, newValue) => {
-        if (id === "mode") {
-          draft.mode = newValue as CodexCompatConfig["mode"];
+        const previous = normalizeConfig(draft);
+        const next = id === "mode"
+          ? { mode: newValue as CodexCompatConfig["mode"], modelPrefixes: [...draft.modelPrefixes] }
+          : { mode: draft.mode, modelPrefixes: parsePrefixes(newValue) };
+        const saveResult = options.save(next);
+        if (!saveResult.ok) {
+          settings?.updateValue(id, id === "mode" ? previous.mode : formatPrefixes(previous.modelPrefixes));
+          draft.mode = previous.mode;
+          draft.modelPrefixes = previous.modelPrefixes;
+          errorText.setText(theme.fg("error", `Change failed: ${saveResult.error}`));
           updateStatus();
-        } else if (id === "prefixes") {
-          draft.modelPrefixes = parsePrefixes(newValue);
-          updateStatus();
-        } else if (id === "save") {
-          const saveResult = options.save(normalizeConfig(draft));
-          if (!saveResult.ok) {
-            errorText.setText(theme.fg("error", `Save failed: ${saveResult.error}`));
-            tui.requestRender();
-            return;
-          }
-          done({ kind: "saved", config: normalizeConfig(draft), path: saveResult.path });
-        } else if (id === "cancel") {
-          done({ kind: "cancelled" });
+          return;
         }
+        draft.mode = next.mode;
+        draft.modelPrefixes = next.modelPrefixes;
+        options.apply(next);
+        errorText.setText("");
+        updateStatus();
       },
-      () => done({ kind: "cancelled" }),
+      () => done(),
     );
     container.addChild(settings);
 
@@ -226,6 +219,4 @@ export async function openSettingsPanel(
       },
     };
   });
-
-  return result ?? { kind: "cancelled" };
 }
