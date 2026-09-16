@@ -186,6 +186,9 @@ bundled roots (development-only dependencies are excluded):
 
 ## License texts
 
+Each `Content SHA-256` below covers the LF-normalized text inside its fenced
+block, including the final newline before the closing fence.
+
 ### License text 1
 
 Content SHA-256: `01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f`
@@ -268,7 +271,7 @@ SOFTWARE.
 
 ### License text 4
 
-Content SHA-256: `061dc50af2cd9340703daf61978af3200cf681b12ea67a323c33ba109a23a45e`
+Content SHA-256: `a50b6cbe8a27d28a0d9c58ba30effda2554513d10b70e05707a8edd62cad524e`
 
 Applies to:
 - `lru 0.16.4` — `LICENSE`
@@ -813,7 +816,7 @@ SOFTWARE.
 
 ### License text 16
 
-Content SHA-256: `1c07d19ccbe2578665ab7d8c63f71559f890eb8d2a82fa39d0206b7a3414064f`
+Content SHA-256: `ab796384cae4da5ddd2f8926b18ac6237096a01017b9916ce8027e70825b8e3c`
 
 Applies to:
 - `shared_library 0.1.9` — `LICENSE-MIT`
@@ -919,7 +922,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 19
 
-Content SHA-256: `20fe7b00e904ed690e3b9fd6073784d3fc428141dbd10b81c01fd143d0797f58`
+Content SHA-256: `62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a`
 
 Applies to:
 - `allocator-api2 0.2.21` — `LICENSE-APACHE`
@@ -1211,7 +1214,7 @@ SOFTWARE.
 
 ### License text 23
 
-Content SHA-256: `268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5`
+Content SHA-256: `a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a`
 
 Applies to:
 - `wasi 0.11.1+wasi-snapshot-preview1` — `LICENSE-Apache-2.0_WITH_LLVM-exception`
@@ -1475,7 +1478,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 25
 
-Content SHA-256: `2aa92cada6431e75615e3fe6cb1a9082c98f777d48ae1c087c0da0e37f7b8bff`
+Content SHA-256: `4b6c5ac5c550bea22b1d6455684b21d94ca96f3bcbbc2840b793180707ed582a`
 
 Applies to:
 - `moxcms 0.8.1` — `LICENSE.md`
@@ -1595,7 +1598,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 29
 
-Content SHA-256: `36516aefdc84c5d5a1e7485425913a22dbda69eb1930c5e84d6ae4972b5194b9`
+Content SHA-256: `23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3`
 
 Applies to:
 - `allocator-api2 0.2.21` — `LICENSE-MIT`
@@ -1900,7 +1903,7 @@ SOFTWARE.
 
 ### License text 38
 
-Content SHA-256: `4f6bd11a0f17fe5b085ace1daaedb7b002a08316850dd9577c246c6a68a68e8c`
+Content SHA-256: `2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89`
 
 Applies to:
 - `unicase 2.9.0` — `LICENSE-MIT`
@@ -1964,7 +1967,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 40
 
-Content SHA-256: `516b24e051bf5630880ebbd55c40a25ce9552ebaf8970a53e8976eb70e522406`
+Content SHA-256: `3c97f5b6ad4e73ad22dc0d1e0c7120579a350df57095120017ddfe5a8669604e`
 
 Applies to:
 - `typenum 1.20.1` — `LICENSE-APACHE`
@@ -2198,7 +2201,7 @@ limitations under the License.
 
 ### License text 42
 
-Content SHA-256: `573f5227db835cd30bbdd3aed3f82615f80119a4d5c82b4daf642dbfe2b6afde`
+Content SHA-256: `776aa6f89099bf24a9bceac4b7d9ad8946c017161de770698b5a5cc8de0254a6`
 
 Applies to:
 - `weezl 0.1.12` — `LICENSE-MIT`
@@ -2290,7 +2293,7 @@ THE SOFTWARE.
 
 ### License text 45
 
-Content SHA-256: `5e05b024f653a5ce199e77cbbbd42fb5553562ec714b819421ed0c3e552a75d7`
+Content SHA-256: `3c125f249fc6fb19f2415d027a0d9a170860583960ea53d08ea1d2b3f269d153`
 
 Applies to:
 - `stable_deref_trait 1.2.1` — `LICENSE-MIT`
@@ -2604,7 +2607,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 49
 
-Content SHA-256: `66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172`
+Content SHA-256: `3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04`
 
 Applies to:
 - `option-ext 0.2.0` — `LICENSE.txt`
@@ -3574,7 +3577,7 @@ written authorization of the copyright holder.
 
 ### License text 55
 
-Content SHA-256: `769f80b5bcb42ed0af4e4d2fd74e1ac9bf843cb80c5a29219d1ef3544428a6bb`
+Content SHA-256: `a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2`
 
 Applies to:
 - `gif 0.14.2` — `LICENSE-APACHE`
@@ -3890,7 +3893,7 @@ For more information, please refer to <http://unlicense.org/>
 
 ### License text 59
 
-Content SHA-256: `816000f9c28f7005d931c77636eb79fa7020071eb0f6e6a995515dfccd3559cb`
+Content SHA-256: `6919f1acec82afc721be2d9907b993267f433a44d25d8aedf1003b5f59ebfd46`
 
 Applies to:
 - `mime_guess 2.0.5` — `LICENSE`
@@ -5866,7 +5869,7 @@ DEALINGS IN THE SOFTWARE.
 
 ### License text 78
 
-Content SHA-256: `b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744`
+Content SHA-256: `1d4c38d56650edc2c673cadbec74bec14db1fe8f2f10f4e3477dcbb49563be40`
 
 Applies to:
 - `foldhash 0.2.0` — `LICENSE`
@@ -6209,7 +6212,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ### License text 83
 
-Content SHA-256: `c09aae9d3c77b531f56351a9947bc7446511d6b025b3255312d3e3442a9a7583`
+Content SHA-256: `eb69613e00e596e13d2f58e820aee10e9d51754b91d7111bc997f1fc90791f66`
 
 Applies to:
 - `generic-array 0.14.7` — `LICENSE`
@@ -6240,7 +6243,7 @@ SOFTWARE.
 
 ### License text 84
 
-Content SHA-256: `c144680885b29e4719e2a51f0aab5439a1e02d980692b5aaf086cae12727f28b`
+Content SHA-256: `8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90`
 
 Applies to:
 - `shared_library 0.1.9` — `LICENSE-APACHE`
@@ -6778,7 +6781,7 @@ SOFTWARE.
 
 ### License text 89
 
-Content SHA-256: `c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08`
+Content SHA-256: `b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1`
 
 Applies to:
 - `crc32fast 1.5.1` — `LICENSE-APACHE`
@@ -7817,7 +7820,7 @@ limitations under the License.
 
 ### License text 100
 
-Content SHA-256: `db11fec9946737df39ca3898d9cd8c10ec6f6c3a884a6802b0ad0b81b4e8f23a`
+Content SHA-256: `36bb253818ac13761081556ff5c457d626da9df1eb4f56194d9ad3926c418a68`
 
 Applies to:
 - `typenum 1.20.1` — `LICENSE`
@@ -7828,7 +7831,7 @@ MIT OR Apache-2.0
 
 ### License text 101
 
-Content SHA-256: `df9cfd06d8a44d9a671eadd39ffd97f166481da015a30f45dfd27886209c5922`
+Content SHA-256: `8b87502eddb2d7fa23d54ed2caf5681ab5fbbdc8eb553e8ade710240842f9097`
 
 Applies to:
 - `mime 0.3.17` — `LICENSE-MIT`
@@ -7928,7 +7931,7 @@ limitations under the License.
 
 ### License text 103
 
-Content SHA-256: `e6a8ae2d796083783efc94b1e66271aa2929dc4dfb231d34239aa9c7db8396db`
+Content SHA-256: `e4374ca982ab0914b599a16174d0aad4a8bb2efb3956ea2f51431536c7c1d22a`
 
 Applies to:
 - `redox_users 0.5.2` — `LICENSE`
@@ -7959,7 +7962,7 @@ SOFTWARE.
 
 ### License text 104
 
-Content SHA-256: `e72111c52b7d96ebe25348dee19f0744f444d3c95ae6b1ecb6ccaecc5bce05ba`
+Content SHA-256: `ae078f5c300de75464ac3feafe98111bd27ce41d226d95d30adc280479517ac2`
 
 Applies to:
 - `zlib-rs 0.6.7` — `LICENSE`
