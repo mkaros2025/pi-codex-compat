@@ -84,7 +84,11 @@ export function writeConfig(
     renameSync(temporaryPath, path);
     return { ok: true, path };
   } catch (error) {
-    rmSync(temporaryPath, { force: true });
+    try {
+      rmSync(temporaryPath, { force: true });
+    } catch {
+      // Keep the original write error when the config parent itself is invalid.
+    }
     return {
       ok: false,
       path,

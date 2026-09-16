@@ -89,6 +89,42 @@ test("RPC panel saves, cancels, and reports write errors", async () => {
   assert.deepEqual(notifications, ["permission denied"]);
 });
 
+test("TUI panel discards edited mode and prefixes on cancel", async () => {
+  let component: PanelComponent | undefined;
+  let resolved: SettingsPanelResult | undefined;
+  const saved: CodexCompatConfig[] = [];
+  const ui = {
+    custom: async (factory: (tui: unknown, theme: unknown, keybindings: unknown, done: (value: SettingsPanelResult) => void) => PanelComponent) => {
+      component = factory(
+        { requestRender() {} },
+        { fg: (_color: string, text: string) => text, bold: (text: string) => text },
+        {},
+        (value) => { resolved = value; },
+      );
+      const panel = component;
+      panel.handleInput?.("\r");
+      panel.handleInput?.("\u001b[B");
+      panel.handleInput?.("\r");
+      panel.handleInput?.("\u0001");
+      panel.handleInput?.("\u000b");
+      panel.handleInput?.("gpt,o3");
+      panel.handleInput?.("\r");
+      panel.handleInput?.("\u001b");
+      panel.handleInput?.("\u001b");
+      return resolved;
+    },
+  };
+  const result = await openSettingsPanel(
+    context(ui, "tui"),
+    options((value) => {
+      saved.push(value);
+      return { ok: true, path: "/tmp/pi-codex-compat.json" };
+    }),
+  );
+  assert.deepEqual(result, { kind: "cancelled" });
+  assert.deepEqual(saved, []);
+});
+
 test("TUI panel keeps a save error visible until cancelled", async () => {
   let component: PanelComponent | undefined;
   let doneCalled = false;
@@ -114,4 +150,39 @@ test("TUI panel keeps a save error visible until cancelled", async () => {
     options(() => ({ ok: false, error: "permission denied", path: "/tmp/pi-codex-compat.json" })),
   );
   assert.deepEqual(result, { kind: "cancelled" });
+});
+
+test("TUI panel can retry a failed save", async () => {
+  let component: PanelComponent | undefined;
+  let resolved: SettingsPanelResult | undefined;
+  let attempts = 0;
+  const ui = {
+    custom: async (factory: (tui: unknown, theme: unknown, keybindings: unknown, done: (value: SettingsPanelResult) => void) => PanelComponent) => {
+      component = factory(
+        { requestRender() {} },
+        { fg: (_color: string, text: string) => text, bold: (text: string) => text },
+        {},
+        (value) => { resolved = value; },
+      );
+      const panel = component;
+      panel.handleInput?.("\u001b[B");
+      panel.handleInput?.("\u001b[B");
+      panel.handleInput?.("\r");
+      assert.equal(resolved, undefined);
+      assert.match(panel.render(100).join("\n"), /Save failed: try again/);
+      panel.handleInput?.("\r");
+      return resolved;
+    },
+  };
+  const result = await openSettingsPanel(
+    context(ui, "tui"),
+    options(() => {
+      attempts += 1;
+      return attempts === 1
+        ? { ok: false, error: "try again", path: "/tmp/pi-codex-compat.json" }
+        : { ok: true, path: "/tmp/pi-codex-compat.json" };
+    }),
+  );
+  assert.deepEqual(result, { kind: "saved", config, path: "/tmp/pi-codex-compat.json" });
+  assert.equal(attempts, 2);
 });
