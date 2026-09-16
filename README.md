@@ -8,8 +8,8 @@ Focused fork of the Codex tool adapter for Pi. It keeps only:
 - `view_image`
 
 The tools activate automatically for model IDs beginning with `gpt` by default.
-Use `auto`, `on`, or `off` in `pi-codex-compat.json`, and adjust
-`modelPrefixes` when needed. Project settings are read only for trusted folders.
+Use `auto`, `on`, or `off` in the global `pi-codex-compat.json`, and adjust
+`modelPrefixes` when needed.
 
 ```bash
 pi install git:github.com/mkaros2025/pi-codex-compat

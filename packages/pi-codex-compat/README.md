@@ -30,12 +30,8 @@ Configuration is independent of other extensions:
 ```
 
 Global config: `~/.pi/agent/pi-codex-compat.json`
-Trusted project config: `<project>/.pi/pi-codex-compat.json`
 
-A trusted project file overrides the global values. Untrusted project files are
-ignored. Existing `pi-codex-tools.json` files are read as legacy config when
-the new file is absent; writes go to the new compat filename. Use
-`/codex-compat` to inspect settings, or:
+Use `/codex-compat` to open the settings panel, or:
 
 ```text
 /codex-compat auto

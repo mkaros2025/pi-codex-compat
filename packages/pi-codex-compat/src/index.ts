@@ -7,14 +7,13 @@ import { createViewImageTool } from "./tools/view-image/tool.ts";
 import {
   DEFAULT_CODEX_COMPAT_CONFIG,
   getGlobalConfigPath,
-  getProjectConfigPath,
   readEffectiveConfig,
   writeConfig,
-  type ConfigScope,
   type CodexCompatMode,
 } from "./config.ts";
 import { shouldActivate } from "./model.ts";
 import { createPermissionBridge } from "./permissions.ts";
+import { openSettingsPanel } from "./settings-panel.ts";
 
 export const CODEX_COMPAT_TOOL_NAMES = [
   "exec_command",
@@ -59,29 +58,27 @@ function disableTools(pi: ExtensionAPI, state: ActivationState): void {
 }
 
 function parseCommand(args: string): {
-  scope: ConfigScope;
-  action: "mode" | "prefixes" | "show";
+  action: "panel" | "mode" | "prefixes" | "show";
   value?: string;
 } | { error: string } {
   const tokens = args.trim().split(/\s+/).filter(Boolean);
-  let scope: ConfigScope = "global";
-  if (tokens[0] === "global" || tokens[0] === "project") scope = tokens.shift() as ConfigScope;
   const action = tokens.shift();
-  if (!action || action === "show") return { scope, action: "show" };
+  if (!action) return { action: "panel" };
+  if (action === "show") return { action: "show" };
   if (action === "auto" || action === "on" || action === "off") {
     if (tokens.length > 0) return { error: "Mode takes no extra arguments" };
-    return { scope, action: "mode", value: action };
+    return { action: "mode", value: action };
   }
   if (action === "prefixes") {
     const value = tokens.join(" ").split(/[\s,]+/).filter(Boolean);
     if (value.length === 0) return { error: "Provide at least one model prefix" };
-    return { scope, action: "prefixes", value: value.join("\n") };
+    return { action: "prefixes", value: value.join("\n") };
   }
   return { error: "Use auto, on, off, or prefixes <prefix,...>" };
 }
 
 function sync(pi: ExtensionAPI, ctx: ExtensionContext, state: ActivationState, model = ctx.model): void {
-  const config = readEffectiveConfig({ cwd: ctx.cwd, projectTrusted: ctx.isProjectTrusted() });
+  const config = readEffectiveConfig();
   if (shouldActivate(model, config)) enableTools(pi, state);
   else disableTools(pi, state);
 }
@@ -114,28 +111,37 @@ export default function piCodexCompat(pi: ExtensionAPI): void {
         ctx.ui.notify(command.error, "warning");
         return;
       }
+      if (command.action === "panel") {
+        const result = await openSettingsPanel(ctx, {
+          config: readEffectiveConfig(),
+          model: ctx.model,
+          activeToolCount: pi.getActiveTools().filter((name) => OWNED_TOOL_NAMES.has(name)).length,
+          save: (config) => writeConfig(config),
+        });
+        if (result.kind === "saved") {
+          sync(pi, ctx, state);
+          ctx.ui.notify(`Saved ${result.path}`, "info");
+        }
+        return;
+      }
       if (command.action === "show") {
-        const config = readEffectiveConfig({ cwd: ctx.cwd, projectTrusted: ctx.isProjectTrusted() });
+        const config = readEffectiveConfig();
         ctx.ui.notify(
           `mode=${config.mode}; modelPrefixes=${config.modelPrefixes.join(", ")}; active=${shouldActivate(ctx.model, config)}\n` +
-            `global: ${getGlobalConfigPath()}\n` +
-            `project: ${getProjectConfigPath(ctx.cwd)} (${ctx.isProjectTrusted() ? "enabled" : "ignored until trusted"})`,
+            `global: ${getGlobalConfigPath()}`,
         );
         return;
       }
       const patch = command.action === "mode"
         ? { mode: command.value as CodexCompatMode }
         : { modelPrefixes: command.value!.split("\n") };
-      const result = writeConfig(command.scope, patch, {
-        cwd: ctx.cwd,
-        projectTrusted: ctx.isProjectTrusted(),
-      });
+      const result = writeConfig(patch);
       if (!result.ok) {
         ctx.ui.notify(result.error, "error");
         return;
       }
       sync(pi, ctx, state);
-      ctx.ui.notify(`Saved ${result.path}`);
+      ctx.ui.notify(`Saved ${result.path}`, "info");
     },
   });
 }
